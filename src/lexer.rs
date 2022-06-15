@@ -1,6 +1,6 @@
 pub mod token;
 
-use token::Token;
+use token::*;
 
 pub struct Lexer {
     pub chars: Vec<char>,
@@ -26,10 +26,10 @@ impl Lexer {
                 result.push(self.parse_digit());
             } else {
                 result.push(match current {
-                    '+' => Token::OpPlus,
-                    '-' => Token::OpMinus,
-                    '*' => Token::OpMultiply,
-                    '/' => Token::OpDevide,
+                    '+' => Token::Op(Op::Plus),
+                    '-' => Token::Op(Op::Minus),
+                    '*' => Token::Op(Op::Multiply),
+                    '/' => Token::Op(Op::Devide),
                     '(' => Token::ParenL,
                     ')' => Token::ParenR,
                     _ => {
@@ -62,6 +62,7 @@ impl Lexer {
             self.advance();
         }
         if self.current() == '.' {
+            self.advance();
             while self.current().is_digit(10) {
                 self.advance();
             }

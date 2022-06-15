@@ -1,9 +1,9 @@
-use crate::parser::Token;
+use crate::{parser::Token, parser::Op};
 
 #[derive(Debug)]
 pub enum Node {
-    BinaryOp(Box<Node>, Token, Box<Node>),
-    UnaryOp(Token, Box<Node>),
+    BinaryOp(Box<Node>, Op, Box<Node>),
+    UnaryOp(Op, Box<Node>),
     Number(Token),
     Void
 }

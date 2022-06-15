@@ -1,4 +1,4 @@
-use crate::lexer::token::Token;
+use crate::lexer::token::*;
 pub mod nodes;
 use nodes::Node;
 
@@ -21,7 +21,6 @@ impl Parser {
         self.advance();
         match current {
             Token::Integer(_) | Token::Real(_) => {
-                self.advance();
                 Node::Number(current)
             }
             Token::ParenL => {
@@ -38,9 +37,9 @@ impl Parser {
     fn factor(&mut self) -> Node {
         let current = self.current();
         match current {
-            Token::OpPlus | Token::OpMinus => {
+            Token::Op(op @ Op::Plus | op @ Op::Minus) => {
                 self.advance();
-                Node::UnaryOp(current, Box::new(self.atom()))
+                Node::UnaryOp(op, Box::new(self.atom()))
             }
             _ => self.atom(),
         }
@@ -48,20 +47,18 @@ impl Parser {
 
     fn mul(&mut self) -> Node {
         let mut res = self.factor();
-        while self.current() == Token::OpMultiply || self.current() == Token::OpDevide {
-            let tmp = self.current();
+        while let Token::Op(op @ Op::Multiply | op @ Op::Devide) = self.current() {
             self.advance();
-            res = Node::BinaryOp(Box::new(res), tmp, Box::new(self.factor()))
+            res = Node::BinaryOp(Box::new(res), op, Box::new(self.factor()));
         }
         res
     }
 
     fn sum(&mut self) -> Node {
         let mut res = self.mul();
-        while self.current() == Token::OpPlus || self.current() == Token::OpMinus {
-            let tmp = self.current();
+        while let Token::Op(op @ Op::Plus | op @ Op::Minus) = self.current() {
             self.advance();
-            res = Node::BinaryOp(Box::new(res), tmp, Box::new(self.mul()))
+            res = Node::BinaryOp(Box::new(res), op, Box::new(self.mul()));
         }
         res
     }
