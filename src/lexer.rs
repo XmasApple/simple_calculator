@@ -1,5 +1,4 @@
-mod token;
-use std::str::Chars;
+pub mod token;
 
 use token::Token;
 

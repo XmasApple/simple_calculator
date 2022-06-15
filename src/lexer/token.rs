@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Token {
     Integer(usize),
     Real(f64),
@@ -8,4 +8,5 @@ pub enum Token {
     OpDevide,
     ParenL,
     ParenR,
+    Terminator,
 }

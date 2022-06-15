@@ -1,6 +1,9 @@
 use std::io;
+
 mod lexer;
 use lexer::Lexer;
+mod parser;
+use parser::Parser;
 
 fn main() {
     loop {
@@ -13,5 +16,8 @@ fn main() {
         let lexer = Lexer::new(expr);
         let tokens = lexer.parse();
         println!("{tokens:?}");
+        let parser = Parser::new(tokens);
+        let ast = parser.parse();
+        println!("{ast:?}");
     }
 }
