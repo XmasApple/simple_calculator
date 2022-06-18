@@ -16,10 +16,10 @@ fn main() {
         let expr = expr.trim().to_string();
         let lexer = Lexer::new(expr);
         let tokens = lexer.parse();
-        println!("{tokens:?}");
+        //println!("{tokens:?}");
         let parser = Parser::new(tokens);
         let ast = parser.parse();
-        println!("{ast:?}");
+        //println!("{ast:?}");
         let result = interpreter::visit(&ast);
         println!("{result:?}");
     }

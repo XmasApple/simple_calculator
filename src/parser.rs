@@ -26,7 +26,7 @@ impl Parser {
                 self.advance();
                 expr
             }
-            Token::Integer(_) | Token::Real(_) => Node::Number(current),
+            Token::Number(number) => Node::Number(number),
             Token::Terminator => panic!("Syntax Error"),
             _ => self.expr(),
         }

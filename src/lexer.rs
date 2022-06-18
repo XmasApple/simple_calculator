@@ -61,21 +61,22 @@ impl Lexer {
         while self.current().is_digit(10) {
             self.advance();
         }
-        if self.current() == '.' {
+        Token::Number(if self.current() == '.' {
             self.advance();
             while self.current().is_digit(10) {
                 self.advance();
             }
-            return Token::Real(
+            Number::Real(
                 String::from_iter(self.chars[start..self.ptr].iter())
                     .parse()
                     .unwrap(),
-            );
-        }
-        Token::Integer(
-            String::from_iter(self.chars[start..self.ptr].iter())
-                .parse()
-                .unwrap(),
-        )
+            )
+        } else {
+            Number::Integer(
+                String::from_iter(self.chars[start..self.ptr].iter())
+                    .parse()
+                    .unwrap(),
+            )
+        })
     }
 }
