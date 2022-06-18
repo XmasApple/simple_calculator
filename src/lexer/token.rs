@@ -1,6 +1,6 @@
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Token {
-    Integer(usize),
+    Integer(isize),
     Real(f64),
     Op(Op),
     ParenL,

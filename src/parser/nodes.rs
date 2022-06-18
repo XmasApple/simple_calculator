@@ -4,6 +4,5 @@ use crate::{parser::Token, parser::Op};
 pub enum Node {
     BinaryOp(Box<Node>, Op, Box<Node>),
     UnaryOp(Op, Box<Node>),
-    Number(Token),
-    Void
+    Number(Token)
 }

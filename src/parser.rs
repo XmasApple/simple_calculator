@@ -20,15 +20,13 @@ impl Parser {
         let current = self.current();
         self.advance();
         match current {
-            Token::Integer(_) | Token::Real(_) => {
-                Node::Number(current)
-            }
             Token::ParenL => {
-                self.advance();
                 let expr = self.expr();
                 assert!(self.current() == Token::ParenR, "Syntax Error");
+                self.advance();
                 expr
             }
+            Token::Integer(_) | Token::Real(_) => Node::Number(current),
             Token::Terminator => panic!("Syntax Error"),
             _ => self.expr(),
         }
@@ -36,13 +34,11 @@ impl Parser {
 
     fn factor(&mut self) -> Node {
         let current = self.current();
-        match current {
-            Token::Op(op @ Op::Plus | op @ Op::Minus) => {
-                self.advance();
-                Node::UnaryOp(op, Box::new(self.atom()))
-            }
-            _ => self.atom(),
+        if let Token::Op(op @ Op::Plus | op @ Op::Minus) = current {
+            self.advance();
+            return Node::UnaryOp(op, Box::new(self.factor()));
         }
+        self.atom()
     }
 
     fn mul(&mut self) -> Node {

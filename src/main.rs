@@ -4,6 +4,7 @@ mod lexer;
 use lexer::Lexer;
 mod parser;
 use parser::Parser;
+mod interpreter;
 
 fn main() {
     loop {
@@ -19,5 +20,7 @@ fn main() {
         let parser = Parser::new(tokens);
         let ast = parser.parse();
         println!("{ast:?}");
+        let result = interpreter::visit(&ast);
+        println!("{result:?}");
     }
 }
