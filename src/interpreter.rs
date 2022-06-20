@@ -12,33 +12,83 @@ pub fn visit(node: &Node) -> Number {
 }
 
 fn visit_binary(node: &Node) -> Number {
+    println!("{node:?}");
     if let Node::BinaryOp(left, op, right) = node {
         let left = visit(left.to_owned());
         let right = visit(right.to_owned());
-        match (left, op, right) {
-            (Number::Integer(a), op, Number::Integer(b)) => match op {
-                Op::Plus => Number::Integer(a + b),
-                Op::Minus => Number::Integer(a + b),
-                Op::Multiply => Number::Integer(a * b),
-                Op::Devide => Number::Real(a as f64 / b as f64),
+        match op {
+            Op::Plus => match left {
+                Number::Integer(a) => match right {
+                    Number::Integer(b) => Number::Integer(a + b),
+                    Number::Real(b) => Number::Real(a as f64 + b),
+                    _ => right,
+                },
+                Number::Real(a) => match right {
+                    Number::Integer(b) => Number::Real(a + b as f64),
+                    Number::Real(b) => Number::Real(a + b),
+                    _ => right,
+                },
+                _ => left,
             },
-            (Number::Integer(a), op, Number::Real(b)) => match op {
-                Op::Plus => Number::Real(a as f64 + b),
-                Op::Minus => Number::Real(a as f64 + b),
-                Op::Multiply => Number::Real(a as f64 * b),
-                Op::Devide => Number::Real(a as f64 / b),
+            Op::Minus => match left {
+                Number::Integer(a) => match right {
+                    Number::Integer(b) => Number::Integer(a - b),
+                    Number::Real(b) => Number::Real(a as f64 - b),
+                    Number::InfPlus => Number::InfMinus,
+                    Number::InfMinus => Number::InfPlus,
+                    _ => right,
+                },
+                Number::Real(a) => match right {
+                    Number::Integer(b) => Number::Real(a - b as f64),
+                    Number::Real(b) => Number::Real(a - b),
+                    Number::InfPlus => Number::InfMinus,
+                    Number::InfMinus => Number::InfPlus,
+                    _ => right,
+                },
+                _ => left,
             },
-            (Number::Real(a), op, Number::Integer(b)) => match op {
-                Op::Plus => Number::Real(a + b as f64),
-                Op::Minus => Number::Real(a + b as f64),
-                Op::Multiply => Number::Real(a * b as f64),
-                Op::Devide => Number::Real(a / b as f64),
+            Op::Multiply => match left {
+                Number::Integer(a) => match right {
+                    Number::Integer(b) => Number::Integer(a * b),
+                    Number::Real(b) => Number::Real(a as f64 * b),
+                    Number::InfMinus => match a {
+                        a if a < 0 => Number::InfPlus,
+                        a if a > 0 => Number::InfMinus,
+                        _ => Number::Integer(0),
+                    },
+                    _ => right,
+                },
+                Number::Real(a) => match right {
+                    Number::Integer(b) => Number::Real(a * b as f64),
+                    Number::Real(b) => Number::Real(a * b),
+                    Number::InfMinus => match a {
+                        a if a < 0.0 => Number::InfPlus,
+                        a if a > 0.0 => Number::InfMinus,
+                        _ => Number::Integer(0),
+                    },
+                    _ => right,
+                },
+                Number::InfMinus if matches!(right, Number::InfMinus) => Number::InfPlus,
+                _ => left,
             },
-            (Number::Real(a), op, Number::Real(b)) => match op {
-                Op::Plus => Number::Real(a + b),
-                Op::Minus => Number::Real(a + b),
-                Op::Multiply => Number::Real(a * b),
-                Op::Devide => Number::Real(a / b),
+            Op::Devide => match left {
+                Number::Integer(a) => match right {
+                    Number::Integer(0) => Number::Nan,
+                    Number::Real(b) if b == 0.0 => Number::Nan,
+                    Number::Integer(b) if a % b == 0 => Number::Integer(a / b),
+                    Number::Integer(b) => Number::Real(a as f64 / b as f64),
+                    Number::Real(b) => Number::Real(a as f64 / b),
+                    Number::InfMinus | Number::InfPlus => Number::Nan,
+                    _ => right,
+                },
+                Number::Real(a) => match right {
+                    Number::Integer(0) => Number::Nan,
+                    Number::Real(b) if b == 0.0 => Number::Nan,
+                    Number::Integer(b) => Number::Real(a / b as f64),
+                    Number::Real(b) => Number::Real(a / b),
+                    _ => right,
+                },
+                _ => left,
             },
         }
     } else {

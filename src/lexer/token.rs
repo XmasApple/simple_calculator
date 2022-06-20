@@ -21,6 +21,9 @@ pub enum Op {
 pub enum Number {
     Integer(isize),
     Real(f64),
+    Nan,
+    InfPlus,
+    InfMinus,
 }
 
 impl fmt::Debug for Number {
@@ -28,6 +31,9 @@ impl fmt::Debug for Number {
         match self {
             Number::Integer(a) => write!(f, "{:?}", a),
             Number::Real(a) => write!(f, "{:?}", a),
+            Number::InfPlus => write!(f, "InfPlus"),
+            Number::Nan => write!(f, "Nan"),
+            Number::InfMinus => write!(f, "InfMinus"),
         }
     }
 }
@@ -37,6 +43,9 @@ impl fmt::Display for Number {
         match self {
             Number::Integer(a) => write!(f, "{:?}", a),
             Number::Real(a) => write!(f, "{:?}", a),
+            Number::InfPlus => write!(f, "Inf"),
+            Number::Nan => write!(f, "NaN"),
+            Number::InfMinus => write!(f, "-Inf"),
         }
     }
 }
