@@ -32,13 +32,22 @@ impl Parser {
         }
     }
 
+    fn pow(&mut self) -> Node {
+        let mut res = self.atom();
+        while self.current() == Token::Op(Op::Pow) {
+            self.advance();
+            res = Node::BinaryOp(Box::new(res), Op::Pow, Box::new(self.atom()));
+        }
+        res
+    }
+
     fn factor(&mut self) -> Node {
         let current = self.current();
         if let Token::Op(op @ Op::Plus | op @ Op::Minus) = current {
             self.advance();
             return Node::UnaryOp(op, Box::new(self.factor()));
         }
-        self.atom()
+        self.pow()
     }
 
     fn mul(&mut self) -> Node {

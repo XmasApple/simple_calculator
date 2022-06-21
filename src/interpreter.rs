@@ -1,3 +1,5 @@
+use std::{isize, panic};
+
 use crate::{
     lexer::token::{Number, Op},
     parser::nodes::Node,
@@ -103,6 +105,29 @@ fn visit_binary(node: &Node) -> Number {
                     Number::Real(b) => Number::Real(a / b),
                     _ => right,
                 },
+                _ => left,
+            },
+            Op::Pow => match left {
+                Number::Integer(a) => match right {
+                    Number::Integer(b) => {
+                        let res = f64::powf(a as f64, b as f64) as isize;
+                        match res {
+                            isize::MAX => Number::InfPlus,
+                            isize::MIN => Number::InfMinus,
+                            _ => Number::Integer(res),
+                        }
+                    }
+                    Number::Real(b) => Number::Real((a as f64).powf(b)),
+                    Number::InfMinus | Number::InfPlus => Number::Nan,
+                    _ => right,
+                },
+                Number::Real(a) => match right {
+                    Number::Integer(b) => Number::Real(a.powf(b as f64)),
+                    Number::Real(b) => Number::Real(a.powf(b)),
+                    Number::InfMinus | Number::InfPlus => Number::Nan,
+                    _ => right,
+                },
+                Number::InfMinus if matches!(right, Number::InfMinus) => Number::InfPlus,
                 _ => left,
             },
         }

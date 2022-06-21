@@ -15,6 +15,7 @@ pub enum Op {
     Minus,
     Multiply,
     Devide,
+    Pow,
 }
 
 #[derive(Copy, Clone, PartialEq)]

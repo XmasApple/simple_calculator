@@ -30,6 +30,7 @@ impl Lexer {
                     '-' => Token::Op(Op::Minus),
                     '*' => Token::Op(Op::Multiply),
                     '/' => Token::Op(Op::Devide),
+                    '^' => Token::Op(Op::Pow),
                     '(' => Token::ParenL,
                     ')' => Token::ParenR,
                     _ => {
