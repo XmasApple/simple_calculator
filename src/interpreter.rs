@@ -19,7 +19,10 @@ fn visit_binary(node: &Node) -> Number {
         match op {
             Op::Plus => match left {
                 Number::Integer(a) => match right {
-                    Number::Integer(b) => Number::Integer(a + b),
+                    Number::Integer(b) => match a.checked_add(b) {
+                        Some(r) => Number::Integer(r),
+                        None => Number::InfPlus,
+                    },
                     Number::Real(b) => Number::Real(a as f64 + b),
                     _ => right,
                 },
@@ -32,7 +35,10 @@ fn visit_binary(node: &Node) -> Number {
             },
             Op::Minus => match left {
                 Number::Integer(a) => match right {
-                    Number::Integer(b) => Number::Integer(a - b),
+                    Number::Integer(b) => match a.checked_sub(b) {
+                        Some(r) => Number::Integer(r),
+                        None => Number::InfMinus,
+                    },
                     Number::Real(b) => Number::Real(a as f64 - b),
                     Number::InfPlus => Number::InfMinus,
                     Number::InfMinus => Number::InfPlus,
@@ -49,7 +55,16 @@ fn visit_binary(node: &Node) -> Number {
             },
             Op::Multiply => match left {
                 Number::Integer(a) => match right {
-                    Number::Integer(b) => Number::Integer(a * b),
+                    Number::Integer(b) => match a.checked_mul(b) {
+                        Some(r) => Number::Integer(r),
+                        None => {
+                            if a > 0 && b > 0 || a < 0 && b < 0 {
+                                Number::InfPlus
+                            } else {
+                                Number::InfMinus
+                            }
+                        }
+                    },
                     Number::Real(b) => Number::Real(a as f64 * b),
                     Number::InfMinus => match a {
                         a if a < 0 => Number::InfPlus,
